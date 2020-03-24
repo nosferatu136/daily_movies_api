@@ -13,7 +13,19 @@
 # it.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+require 'sequel'
+DB = Sequel.connect(
+  adapter: 'postgres',
+  host: 'localhost',
+  database: 'movies_api',
+  user: 'movies',
+  password: 'M0vi3sAp1'
+)
+
 RSpec.configure do |config|
+  config.around(:each) do |example|
+    DB.transaction(rollback: :always, auto_savepoint: true) { example.run }
+  end
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
